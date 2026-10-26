@@ -1,0 +1,9 @@
+# Run `npm run db:migrate` before the first start. drizzle-kit is not in the
+# runtime image, so apply migrations from the host with .env.local filled in.
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local

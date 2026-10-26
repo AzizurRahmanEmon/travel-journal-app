@@ -1,0 +1,17 @@
+---
+description: Clean, reusable code standards. No slop.
+alwaysApply: true
+---
+
+- Write the minimum code that solves the task. No speculative features, unused params, or "just in case" abstractions.
+- Single responsibility: one function does one thing; keep functions under ~40 lines and files focused.
+- DRY: extract shared logic (auth guard, error handler, validation, API response helpers) into src/lib and reuse it. Search for an existing helper before writing a new one.
+- Strict TypeScript: no `any`, no non-null `!` hacks; infer types from Zod schemas and Drizzle tables.
+- Clear names over comments. Comment only the _why_, never restate the code. No banner comments, no emojis, no TODO filler.
+- No dead code, console.logs, commented-out blocks, or placeholder/mock data left behind.
+- Handle errors once, centrally: throw typed AppError(code, status, message); route handlers use one shared wrapper to format responses.
+- Never swallow errors with empty catch blocks.
+- Config and secrets only via a validated env module (src/lib/env.ts with Zod); never read process.env elsewhere.
+- Don't add a dependency if a few lines or an existing package does the job.
+- Before finishing: run lint, typecheck and tests; re-read the diff and delete anything not needed.
+- If a request is unclear, ask instead of guessing.

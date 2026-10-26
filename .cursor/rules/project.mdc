@@ -1,0 +1,4 @@
+## Project rules
+
+Follow every rule in `.cursor/rules/` (project.mdc and code-quality.mdc).
+Read ARCHITECTURE.md before implementing any feature.
