@@ -235,7 +235,7 @@ describe("photos", () => {
     const response = await POST(await authed("/api/photos", { method: "POST", body: form }));
     const body = (await response.json()) as { data: { name: string; summary: string } };
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(201);
     expect(body.data).toMatchObject({ name: "Beach", summary: "A quiet week by the sea." });
   });
 

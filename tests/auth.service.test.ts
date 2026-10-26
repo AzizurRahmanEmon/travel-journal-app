@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { emailVerificationTokens, users } from "@/db/schema";
 import { hashToken } from "@/lib/auth/tokens";
 import { AppError } from "@/lib/errors";
+import { POST as registerRoute } from "@/app/api/auth/register/route";
 import { register, verifyEmail } from "@/lib/services/auth.service";
 
 const db = vi.hoisted(() => ({
@@ -71,6 +72,19 @@ describe("auth.service", () => {
     const day = 24 * 60 * 60 * 1000;
     expect(expiresAt.getTime()).toBeGreaterThan(Date.now() + day - 5_000);
     expect(expiresAt.getTime()).toBeLessThan(Date.now() + day + 5_000);
+  });
+
+  it("returns 201 when an account is created", async () => {
+    const response = await registerRoute(
+      new Request("http://localhost/api/auth/register", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(validInput),
+      }),
+    );
+
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toEqual({ data: { userId: "user-1" } });
   });
 
   it("returns a conflict when the email is already registered", async () => {
