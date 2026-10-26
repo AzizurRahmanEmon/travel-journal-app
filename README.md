@@ -2,13 +2,19 @@
 
 A personal travel journal: register, verify your email, and keep photos with a name, location, description, and a short AI summary. The API and the UI are one Next.js app.
 
-**Live demo:** [https://your-demo-url.example](https://your-demo-url.example)
+**Live demo:** [https://ar-travel-journal.vercel.app](https://ar-travel-journal.vercel.app)
 
-**Test credentials.** None are committed. Register in the app and open the verification link from email. Replace this note with a verified demo account before sharing a live URL.
+**Repository:** [https://github.com/AzizurRahmanEmon/travel-journal-app](https://github.com/AzizurRahmanEmon/travel-journal-app)
+
+**Test credentials.** None are committed. Register in the app and open the verification link from email.
 
 ## Tech stack
 
-Next.js is the full stack in one deployable unit, so the pages and route handlers ship together. Postgres holds the relational data (users, sessions, and photos owned by a user). Drizzle is the type-safe SQL layer on top of that schema. Zod validates input, bcrypt hashes passwords, jose signs access tokens, otplib and qrcode handle TOTP, Cloudinary stores images, OpenRouter writes summaries, and Resend sends verification email. See [ARCHITECTURE.md](ARCHITECTURE.md).
+**Choice:** Next.js (App Router) with TypeScript, and Neon Postgres.
+
+**Reason:** Next.js serves the pages and the route handlers from one deployable app, so auth, photos, and the UI stay in one codebase. Postgres fits the data: a user owns sessions and photos. Neon is hosted Postgres with a serverless driver, which matches that single deploy.
+
+Drizzle is the type-safe SQL layer. Zod validates input, bcrypt hashes passwords, jose signs access tokens, otplib and qrcode handle TOTP, Cloudinary stores images, OpenRouter writes summaries, and Resend sends verification email. See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Features
 
