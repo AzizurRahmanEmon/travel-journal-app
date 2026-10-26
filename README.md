@@ -8,6 +8,8 @@ A personal travel journal: register, verify your email, and keep photos with a n
 
 **Test credentials.** None are committed. Register in the app and open the verification link from email.
 
+Verification emails are sent from a verified domain, so any real address works.
+
 ## Tech stack
 
 **Choice:** Next.js (App Router) with TypeScript, and Neon Postgres.
@@ -62,8 +64,8 @@ Copy `.env.example` to `.env.local`. Do not commit `.env.local`.
 | Name | Purpose | Where to get it |
 | --- | --- | --- |
 | `DATABASE_URL` | Neon Postgres connection string | [Neon console](https://console.neon.tech) |
-| `JWT_ACCESS_SECRET` | HMAC secret for 15-minute access JWTs and the short-lived 2FA pending token | `openssl rand -base64 32` |
-| `JWT_REFRESH_SECRET` | Separate random secret kept in the env schema. Refresh tokens are opaque random values stored as SHA-256 hashes, not JWTs signed with this secret | `openssl rand -base64 32` |
+| `JWT_ACCESS_SECRET` | HMAC secret for 15-minute access JWTs | `openssl rand -base64 32` |
+| `JWT_REFRESH_SECRET` | HMAC secret for the 5-minute 2FA pending token. Refresh tokens are opaque random values stored as SHA-256 hashes, not JWTs signed with this secret | `openssl rand -base64 32` |
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud that stores uploaded photos | [Cloudinary console](https://console.cloudinary.com) |
 | `CLOUDINARY_API_KEY` | Cloudinary API key used to sign uploads | Cloudinary console, API Keys |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret used to sign uploads and deletes | Cloudinary console, API Keys |
@@ -80,7 +82,7 @@ Success responses are `{ data }`. Errors are `{ error: { code, message, details?
 
 | Method | Path | Auth | Description | Status codes |
 | --- | --- | --- | --- | --- |
-| POST | `/api/auth/register` | No | Create an unverified user and email a 24-hour verification link | 200, 400, 409 |
+| POST | `/api/auth/register` | No | Create an unverified user and email a 24-hour verification link | 201, 400, 409 |
 | POST | `/api/auth/verify-email` | No | Verify the email from the token | 200, 400 |
 | POST | `/api/auth/login` | No | Check the password. Sets session cookies, or returns a 5-minute pending token when 2FA is on | 200, 400, 401, 403, 429 |
 | POST | `/api/auth/refresh` | Refresh cookie | Rotate the refresh token and issue a new access token | 200, 401 |
@@ -91,7 +93,7 @@ Success responses are `{ data }`. Errors are `{ error: { code, message, details?
 | POST | `/api/auth/2fa/verify` | Yes for setup; pending token for login | Confirm setup, or finish login with the authenticator code | 200, 400, 401, 409, 429 |
 | POST | `/api/auth/2fa/disable` | Yes | Turn 2FA off with the current password and a valid code | 200, 400, 401, 429 |
 | GET | `/api/photos` | Yes | List the signed-in user's photos, newest first | 200, 401 |
-| POST | `/api/photos` | Yes | Upload a JPEG, PNG, or WebP up to 5 MB and summarize the description | 200, 400, 401 |
+| POST | `/api/photos` | Yes | Upload a JPEG, PNG, or WebP up to 5 MB and summarize the description | 201, 400, 401 |
 | GET | `/api/photos/[id]` | Yes | Fetch one owned photo | 200, 401, 404 |
 | PUT | `/api/photos/[id]` | Yes | Update name, location, or description. A new description regenerates the summary | 200, 400, 401, 404 |
 | DELETE | `/api/photos/[id]` | Yes | Delete the photo row and the stored file | 204, 401, 404 |
