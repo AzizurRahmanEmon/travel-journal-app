@@ -11,7 +11,8 @@ export const GET = withHandler(async (request) => {
 export const POST = withHandler(async (request) => {
   const { userId } = await requireUser(request);
   const form = await request.formData();
-  return create(userId, textFields(form), await imageUpload(form.get("image")));
+  const photo = await create(userId, textFields(form), await imageUpload(form.get("image")));
+  return Response.json({ data: photo }, { status: 201 });
 });
 
 function textFields(form: FormData) {

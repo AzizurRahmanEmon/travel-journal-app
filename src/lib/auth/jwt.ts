@@ -7,8 +7,10 @@ const PENDING_TTL = "5m";
 
 type TokenPurpose = "access" | "2fa";
 
-function accessSecret(): Uint8Array {
-  return new TextEncoder().encode(env.JWT_ACCESS_SECRET);
+function secretFor(purpose: TokenPurpose): Uint8Array {
+  // A pending 2FA token uses its own secret, so it cannot pass as an access token.
+  const value = purpose === "2fa" ? env.JWT_REFRESH_SECRET : env.JWT_ACCESS_SECRET;
+  return new TextEncoder().encode(value);
 }
 
 export function signAccessToken(userId: string): Promise<string> {
@@ -33,12 +35,12 @@ function signToken(userId: string, purpose: TokenPurpose, ttl: string): Promise<
     .setSubject(userId)
     .setIssuedAt()
     .setExpirationTime(ttl)
-    .sign(accessSecret());
+    .sign(secretFor(purpose));
 }
 
 async function readToken(token: string, purpose: TokenPurpose): Promise<{ userId: string }> {
   try {
-    const { payload } = await jwtVerify(token, accessSecret(), { algorithms: ["HS256"] });
+    const { payload } = await jwtVerify(token, secretFor(purpose), { algorithms: ["HS256"] });
     if (payload.purpose !== purpose || typeof payload.sub !== "string" || payload.sub.length === 0) {
       throw unauthorized("Unauthorized");
     }

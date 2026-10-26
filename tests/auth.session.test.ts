@@ -2,7 +2,7 @@ import { SignJWT } from "jose";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST as loginRoute } from "@/app/api/auth/login/route";
 import { refreshTokens } from "@/db/schema";
-import { signAccessToken, verifyAccessToken } from "@/lib/auth/jwt";
+import { signAccessToken, signPendingToken, verifyAccessToken } from "@/lib/auth/jwt";
 import { requireUser } from "@/lib/auth/guard";
 import { env } from "@/lib/env";
 import { AppError } from "@/lib/errors";
@@ -190,6 +190,17 @@ describe("session auth", () => {
       .sign(new TextEncoder().encode(env.JWT_ACCESS_SECRET));
     const request = new Request("http://localhost/api/auth/me", {
       headers: { cookie: `access_token=${token}` },
+    });
+
+    const error = await capture(() => requireUser(request));
+
+    expect(error).toMatchObject({ status: 401, code: "UNAUTHORIZED" });
+  });
+
+  it("rejects a 2FA pending token used as an access token", async () => {
+    const token = await signPendingToken("user-1");
+    const request = new Request("http://localhost/api/auth/me", {
+      headers: { authorization: `Bearer ${token}` },
     });
 
     const error = await capture(() => requireUser(request));
